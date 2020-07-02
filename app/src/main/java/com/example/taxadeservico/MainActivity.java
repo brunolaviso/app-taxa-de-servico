@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -41,13 +42,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //contaTextView = (TextView) findViewById(R.id.valorTextView);
+        contaTextView = (TextView) findViewById(R.id.valorTextView);
         porcentagemTextView = (TextView) findViewById(R.id.percentTextView);
         taxaTextView = (TextView) findViewById(R.id.GorjetaTextView);
         totalTextView = (TextView) findViewById(R.id.TotalTextView);
 
         taxaTextView.setText(moedaFormatada.format(0));
         totalTextView.setText(moedaFormatada.format(0));
+
+        //configura o receptor TextWatcher de valorEditText
+        EditText valorEditText = findViewById(R.id.valorEditText);
+        valorEditText.addTextChangedListener(valorEditTextWatcher);
+
+        //configura o receptor OnSeekbarChangeListener de porcentagemSeekBar
+        SeekBar porcentagemSeekBar = findViewById(R.id.percentSeekBar);
+        porcentagemSeekBar.setOnSeekBarChangeListener(seekBarListener);
+
     }
 
     private void calcular() {
@@ -66,8 +76,8 @@ public class MainActivity extends AppCompatActivity {
     private final SeekBar.OnSeekBarChangeListener seekBarListener = new SeekBar.OnSeekBarChangeListener()
     {
         @Override
-        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            percent = i/100;
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            percent = progress/100.0;
             calcular();
 
         }
@@ -90,15 +100,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
             try {
                 //obtem o valor da conta e o exibe como moeda corrente
                 valorConta = Double.parseDouble(s.toString());
-                //valorTextView.setText(moedaFormatada.format(valorConta));
+                contaTextView.setText(moedaFormatada.format(valorConta));
             }
             catch (NumberFormatException e)
             {
-                //valorTextView.setText("");
+                contaTextView.setText("");
                 valorConta = 0.0;
             }
 
